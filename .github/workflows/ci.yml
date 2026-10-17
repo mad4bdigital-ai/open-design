@@ -19,14 +19,8 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: ci-${{ github.event_name == 'workflow_dispatch' && github.run_id || github.event.pull_request.number || github.ref }}
-  # Prefer current-head signal over preserving superseded logs: PR authors often
-  # push fixups while this workflow is still running, and stale runs can report
-  # failures for commits reviewers no longer need to evaluate. Release workflows
-  # use cancel-in-progress: false where preserving build evidence matters more.
-  # Manual comparison runs need isolated groups so queued/stuck experiments do
-  # not block the next measurement on this branch.
-  cancel-in-progress: true
+  group: mad4b-latest-head-${{ github.workflow_ref }}-${{ (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'branch' && !github.ref_protected && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/Production' && github.ref != 'refs/heads/production' && github.ref != 'refs/heads/staging' && github.ref != 'refs/heads/Staging' && !startsWith(github.ref, 'refs/heads/release/'))) && (github.event.pull_request.number || github.ref) || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_type == 'branch' && !github.ref_protected && github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/Production' && github.ref != 'refs/heads/production' && github.ref != 'refs/heads/staging' && github.ref != 'refs/heads/Staging' && !startsWith(github.ref, 'refs/heads/release/')) }}
 
 jobs:
   scopes:
